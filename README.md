@@ -7,11 +7,17 @@ Use this link to access the Precious Cargo Chatbot: https://dianayousefnejad.git
 
 Valid Order Numbers: 
 
-ORD12345 (Shipped)
+ORD12345 (Shipped)  (john@example.com)
 
-ORD98765 (Delivered)
+ORD98765 (Delivered) (john@example.com)
 
-ORD55544 (Processing)
+ORD55544 (Processing) (sarah@example.com)
+
+Valid Emails:
+
+john@example.com
+
+sarah@example.com 
 
 #### For testing "I haven't received my package" use ORD98765 because it is a delivered package so you can test the "lost package" functionality. 
 
@@ -73,8 +79,14 @@ The bot also handles user errors gracefully, including invalid order number form
 
 <img width="650" height="650" alt="Screenshot 2025-11-10 at 11 13 32 AM" src="https://github.com/user-attachments/assets/246232e5-8c82-4ba9-80a1-78ef2398f591" />
 
+
 #### Invalid order number format:
 
 <img width="650" height="650" alt="Screenshot 2025-11-10 at 11 19 02 AM" src="https://github.com/user-attachments/assets/2b5541ef-28c6-426c-a57b-18839d5e3cd1" />
+
+
+#### Invalid email format:
+
+<img width="650" height="650" alt="Screenshot 2025-11-10 at 2 01 54 PM" src="https://github.com/user-attachments/assets/4ea53fed-9b66-43f8-8726-78924207a277" />
 
 
