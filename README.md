@@ -59,11 +59,12 @@ The bot also handles user errors gracefully, including invalid order number form
 
 <img width="650" height="650" alt="Screenshot 2025-11-10 at 10 33 59 AM" src="https://github.com/user-attachments/assets/d2022032-b653-473d-9bfe-e51fb8259f49" />
 
+<img width="650" height="650" alt="Screenshot 2025-11-10 at 3 09 09 PM" src="https://github.com/user-attachments/assets/8391542a-b5af-4d7d-9d0d-58706142ed63" />
 
-<img width="650" height="650" alt="Screenshot 2025-11-10 at 10 34 17 AM" src="https://github.com/user-attachments/assets/aae1f961-7ada-4ce6-a394-507021b56ea9" />
+<img width="650" height="650" alt="Screenshot 2025-11-10 at 3 09 20 PM" src="https://github.com/user-attachments/assets/5f6614b7-25ad-4d2a-9cb5-8b56f0dc9471" />
 
 
-<img width="650" height="650" alt="Screenshot 2025-11-10 at 11 11 12 AM" src="https://github.com/user-attachments/assets/8737cc41-1675-4efc-ac16-169c40bce7e5" />
+
 
 ### Email route
 
