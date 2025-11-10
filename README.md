@@ -3,6 +3,18 @@
 ### Setup Instructions
 Use this link to access the Precious Cargo Chatbot: https://dianayousefnejad.github.io/LostPackageChatBot/chatbot.html
 
+#### For Testing:
+
+Valid Order Numbers: 
+
+ORD12345 (Shipped)
+
+ORD98765 (Delivered)
+
+ORD55544 (Processing)
+
+#### For testing "I haven't received my package" use ORD98765 because it is a delivered package so you can test the "lost package" functionality. 
+
 ### My Approach
 
 For this project, I chose to build a chatbot designed to help customers track a lost package. The chatbot includes two main user flows: checking an order status and reporting a missing/not delivered package. In both flows, the user is asked to provide either their order number or their email address. (An email option is provided as an alternative if the user doesn’t have their order number on hand.)
