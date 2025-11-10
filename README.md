@@ -34,7 +34,8 @@ If the user reports that they never received a package, the chatbot also checks 
 The bot also handles user errors gracefully, including invalid order number formats, non-existent order numbers, and cases where an email doesn’t match any orders.
 #### Conversation Flow Chart
 
-<img width="1920" height="1080" alt="Heading 1 (1)" src="https://github.com/user-attachments/assets/1c0726da-3573-49e8-bda2-76429b796677" />
+<img width="1920" height="1080" alt="Heading 1 (2)" src="https://github.com/user-attachments/assets/d8cf87c1-411b-4594-9b95-101bc50d0dbb" />
+
 
 
 ### Screenshots/Examples of the different coversation paths
