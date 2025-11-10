@@ -1,7 +1,7 @@
 # Lost Package Chatbot
 
 ### Setup Instructions
-Use this link to access the Precious Cargo Chatbot: 
+Use this link to access the Precious Cargo Chatbot: https://dianayousefnejad.github.io/LostPackageChatBot/chatbot.html
 
 #### For Testing:
 
