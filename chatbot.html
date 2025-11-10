@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status Bot</title>
+
+    
+    <style>
+        /* styling for chatbot webpage */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* entire screen background */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #faebfa 0%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* chatbot container */
+        .chat-container {
+            width: 90%;
+            max-width: 500px;
+            height: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        /* chatbot header */
+        .chat-header {
+            background: linear-gradient(135deg, #0a0d1b 0%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        /* chatbot header title */
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        /* scrollable area with messages */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f5f5f5;
+        }
+        /* each individual message container */
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        /* animation for bubble */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* bot message alignment */
+        .message.bot {
+            justify-content: flex-start;
+        }
+        /* user message alignment */
+        .message.user {
+            justify-content: flex-end;
+        }
+        /* bubble box */
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        /* bubble style for bot */
+        .message.bot .message-content {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        /* bubble style for user */
+        .message.user .message-content {
+            background: linear-gradient(135deg, #b82272);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        /* input text container */
+        .chat-input-container {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+        /* input field */
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+        /* send button */
+        .send-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #b82272 0%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        /* what is shown when you hover over the send button */
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .send-button:active {
+            transform: scale(0.95);
+        }
+       /* automated reply buttons container */
+        .button-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        /* each automated option */
+        .option-button {
+            padding: 8px 16px;
+            background: #b82272;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        /* what is shown when you hover over the automated option buttons */
+        .option-button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+         /* the 'typing...' indicator bubbles */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 18px;
+            width: fit-content;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+         /* for the bubbles animation (one dot at a time)*/
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+         /* order summary info box */
+        .order-info {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #551723;
+        }
+
+        .order-info strong {
+            color: #b82272;
+        }
+
+        .order-list {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .order-item {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .order-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- title for chatbot -->
+        <div class="chat-header">
+            <h1> Precious Cargo</h1>
+            
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages will appear here -->
+        </div>
+        
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="userInput" placeholder="Type your message..." autocomplete="off">
+            <button class="send-button" id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Chatbot State Management
+        const chatState = {
+            currentStep: 'greeting',
+            orderNumber: '',
+            email: ''
+        };
+    
+        // Simulated order database
+        const orderDatabase = {
+            // Shipped order example 
+            'ORD12345': {
+                orderNumber: 'ORD12345',
+                status: 'Shipped',
+                trackingNumber: 'TRK123456789',
+                currentLocation: 'Memphis, TN Distribution Center',
+                lastUpdate: 'November 9, 2025 at 2:30 PM',
+                estimatedDelivery: 'November 12, 2025',
+                items: 'Blue T-Shirt (x2)',
+                email: 'john@example.com',
+                carrier: 'FedEx'
+            },
+            // Delivered order example (test "I have not received my package" with this order number)
+            'ORD98765': {
+                orderNumber: 'ORD98765',
+                status: 'Delivered',
+                trackingNumber: 'TRK987654321',
+                currentLocation: 'Delivered to front porch',
+                deliveredDate: 'November 8, 2025',
+                deliveredTime: '3:45 PM',
+                items: 'Running Shoes',
+                email: 'john@example.com',
+                carrier: 'UPS'
+            },
+            // Processing order example (different email as other two orders)
+            'ORD55544': {
+                orderNumber: 'ORD55544',
+                status: 'Processing',
+                estimatedShip: 'November 11, 2025',
+                items: 'Laptop Case',
+                email: 'sarah@example.com'
+            }
+        };
+    
+        // Connecting orders to specific emails mapping
+        const emailToOrders = {
+            'john@example.com': ['ORD12345', 'ORD98765'],
+            'sarah@example.com': ['ORD55544']
+        };
+    
+        // DOM Elements
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+    
+        // Main Menu First Message (Two Options)
+        function initChat() {
+            addBotMessage("Hello! How can I help you today?", [
+                "Check order status", //1st option
+                "I haven't received my package" //2nd option
+            ]);
+        }
+    
+        // Creates and adds a message from the bot to the chat window, optionally with clickable buttons.
+        function addBotMessage(text, options = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            
+            let content = `<div class="message-content">${text}`;
+            
+            if (options && options.length > 0) {
+                content += '<div class="button-options">';
+                options.forEach(option => {
+                    const escapedOption = option.replace(/'/g, "\\'");
+                    content += `<button class="option-button" onclick="handleOptionClick('${escapedOption}')">${option}</button>`;
+                });
+                content += '</div>';
+            }
+            
+            content += '</div>';
+            messageDiv.innerHTML = content;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+    
+        // Add user message
+        function addUserMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+    
+        // Show typing indicator
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typing';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            scrollToBottom();
+        }
+    
+        // Remove typing indicator
+        function removeTyping() {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+        }
+    
+        // Scroll to bottom
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    
+        // Handle option button clicks
+        function handleOptionClick(option) {
+            addUserMessage(option);
+            processUserInput(option);
+        }
+    
+        // Validate order number format
+        function isValidOrderNumber(input) {
+            return /^ORD\d{5}$/i.test(input.trim());
+        }
+    
+        // Validate email format
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+    
+        // Mask email for privacy (ex: john@example.com -> j***n@example.com)
+        function maskEmail(email) {
+            const [localPart, domain] = email.split('@');
+            if (localPart.length <= 2) {
+                return localPart[0] + '***@' + domain;
+            }
+            return localPart[0] + '***' + localPart[localPart.length - 1] + '@' + domain;
+        }
+    
+        // Process user input based on current state
+        function processUserInput(input) {
+            const lowerInput = input.toLowerCase().trim();
+            
+            setTimeout(() => {
+                showTyping();
+                
+                setTimeout(() => {
+                    removeTyping();
+                    
+                    // Main conversation flow
+                    if (chatState.currentStep === 'greeting') {
+                        // if user goes with "Order status" route
+                        if (lowerInput.includes('check order') || lowerInput.includes('order status')) {
+                            chatState.currentStep = 'ask_order_number';
+                            addBotMessage("Sure! Please provide your order number (format: ORD12345)");
+                        // if user goes with "I haven't received my package" route
+                        } else if (lowerInput.includes("haven't received") || lowerInput.includes("not received")) {
+                            chatState.currentStep = 'not_received_ask_order';
+                            addBotMessage("I'm sorry to hear that. Let me look up your order. Please provide your order number (format: ORD12345)");
+                        } else {
+                            addBotMessage("I can help you with checking your order status or tracking a lost package. What would you like to do?", [
+                                "Check order status",
+                                "I haven't received my package"
+                            ]);
+                        }
+                    }
+                    else if (chatState.currentStep === 'ask_order_number') {
+                        handleOrderNumberInput(input, false);
+                    }
+                    else if (chatState.currentStep === 'not_received_ask_order') {
+                        handleOrderNumberInput(input, true);
+                    }
+                    else if (chatState.currentStep === 'ask_email') {
+                        handleEmailInput(input, false);
+                    }
+                    else if (chatState.currentStep === 'not_received_ask_email') {
+                        handleEmailInput(input, true);
+                    }
+                    else if (chatState.currentStep === 'ask_if_received') {
+                        handleReceivedConfirmation(input);
+                    }
+                    else if (chatState.currentStep === 'ask_rep_contact') {
+                        handleRepContact(input);
+                    }
+                    else if (chatState.currentStep === 'ended') {
+                        handleEndState(input);
+                    }
+                    
+                }, 1000);
+            }, 300);
+        }
+    
+        // Handle order number input
+        function handleOrderNumberInput(input, isNotReceived) {
+            const lowerInput = input.toLowerCase().trim();
+            const upperInput = input.toUpperCase().trim();
+            
+            // Check if user is trying to provide email instead
+            if (lowerInput.includes('provide email') || lowerInput.includes('email')) {
+                chatState.currentStep = isNotReceived ? 'not_received_ask_email' : 'ask_email';
+                addBotMessage("Sure! Please provide your email address and I'll look up your orders.");
+                return;
+            }
+            
+            // Check if user wants to try again
+            if (lowerInput.includes('try again')) {
+                addBotMessage("Please provide your order number (format: ORD12345)");
+                return;
+            }
+            
+            if (isValidOrderNumber(upperInput)) {
+                if (orderDatabase[upperInput]) {
+                    chatState.orderNumber = upperInput;
+                    const order = orderDatabase[upperInput];
+
+                    // If the package was delivered but user says they didn't receive it
+                    if (isNotReceived && order.status === 'Delivered') {
+                        showOrderInfo(order);
+                        chatState.currentStep = 'ask_if_received';
+                        addBotMessage("I see your order was marked as delivered on " + order.deliveredDate + ". Would you like a representative to contact you about your missing package?", [
+                            "Yes please, I have not received the package",
+                            "No thank you!"
+                        ]);
+                    // else normal order status information because the package has not been delivered yet (shows user the location)
+                    } else {
+                        // Show order status normally
+                        showOrderInfo(order);
+                        chatState.currentStep = 'ended';
+                        addBotMessage("Is there anything else I can help you with?", [
+                            "Check another order",
+                            "No, thank you"
+                        ]);
+                    }
+                } else {
+                    // Order number not found, try again or provide email
+                    addBotMessage("I couldn't find an order with that number. Please double-check and try again, or provide your email address.", [
+                        "Try again",
+                        "Provide email"
+                    ]);
+                }
+            } else {
+                addBotMessage("⚠️ That doesn't look like a valid order number. Order numbers should be in the format ORD12345. Please try again.");
+            }
+        }
+    
+        // Handle email input
+        function handleEmailInput(input, isNotReceived) {
+            const lowerInput = input.toLowerCase().trim();
+            
+            if (lowerInput.includes('no') || lowerInput.includes('representative') || lowerInput.includes('talk to')) {
+                chatState.currentStep = 'ended';
+                addBotMessage("No problem! A customer service representative will reach out to you via email within the next 24 hours. Is there anything else I can help you with?", [
+                    "No, thank you"
+                ]);
+                return;
+            }
+            
+            if (isValidEmail(input)) {
+                chatState.email = input.toLowerCase();
+                
+                if (emailToOrders[chatState.email]) {
+                    // Found orders connected to this email
+                    const orderNumbers = emailToOrders[chatState.email];
+                    displayOrdersForEmail(orderNumbers, isNotReceived);
+                } else {
+                    // No orders connected to this email
+                    chatState.currentStep = 'ask_rep_contact';
+                    addBotMessage("I couldn't find any orders associated with " + input + ". Would you like to speak with a customer service representative?", [
+                        "Yes, contact me",
+                        "No, thank you"
+                    ]);
+                }
+            } else {
+                //valid email address prompt
+                addBotMessage("⚠️ That doesn't appear to be a valid email address. Please enter a valid email (e.g., user@example.com).");
+            }
+        }
+    
+        // Function that displays orders associated with that email
+        function displayOrdersForEmail(orderNumbers, isNotReceived) {
+            chatState.currentStep = 'select_from_email';
+            chatState.isNotReceived = isNotReceived;
+            
+            let orderList = '<div class="order-list">';
+            orderNumbers.forEach((ordNum) => {
+                const order = orderDatabase[ordNum];
+                orderList += `
+                    <div class="order-item" onclick="handleOrderClick('${ordNum}')">
+                        <strong>Order ${ordNum}</strong><br>
+                        Status: ${order.status}<br>
+                        Items: ${order.items}
+                    </div>
+                `;
+            });
+            orderList += '</div>';
+            
+            addBotMessage("I found the following orders for your email. Click on an order to see details:" + orderList);
+        }
+    
+        // Handle order selection from email list
+        function handleOrderClick(orderNum) {
+            addUserMessage("View order " + orderNum);
+            chatState.orderNumber = orderNum;
+            const order = orderDatabase[orderNum];
+            
+            if (chatState.isNotReceived && order.status === 'Delivered') {
+                showOrderInfo(order);
+                chatState.currentStep = 'ask_if_received';
+                addBotMessage("I see your order was marked as delivered on " + order.deliveredDate + ". Have you received this package?", [
+                     "I have not received the package",
+                    "Yes, thank you!"
+                ]);
+            } else {
+                showOrderInfo(order);
+                chatState.currentStep = 'ended';
+                addBotMessage("Is there anything else I can help you with?", [
+                    "Check another order",
+                    "No, thank you"
+                ]);
+            }
+        }
+    
+        // Show order information
+        function showOrderInfo(order) {
+            let orderInfo = `
+                <div class="order-info">
+                    <strong>Order Number:</strong> ${order.orderNumber}<br>
+                    <strong>Status:</strong> ${order.status}<br>
+                    <strong>Items:</strong> ${order.items}<br>
+            `;
+            
+            if (order.status === 'Delivered') {
+                orderInfo += `<strong>Delivered:</strong> ${order.deliveredDate} at ${order.deliveredTime}<br>`;
+                orderInfo += `<strong>Location:</strong> ${order.currentLocation}<br>`;
+                orderInfo += `<strong>Tracking #:</strong> ${order.trackingNumber}<br>`;
+                orderInfo += `<strong>Carrier:</strong> ${order.carrier}`;
+            } else if (order.status === 'Shipped') {
+                orderInfo += `<strong>Tracking #:</strong> ${order.trackingNumber}<br>`;
+                orderInfo += `<strong>Current Location:</strong> ${order.currentLocation}<br>`;
+                orderInfo += `<strong>Last Update:</strong> ${order.lastUpdate}<br>`;
+                orderInfo += `<strong>Est. Delivery:</strong> ${order.estimatedDelivery}<br>`;
+                orderInfo += `<strong>Carrier:</strong> ${order.carrier}`;
+            } else if (order.status === 'Processing') {
+                orderInfo += `<strong>Est. Ship Date:</strong> ${order.estimatedShip}`;
+            }
+            
+            orderInfo += '</div>';
+            addBotMessage("Here's your order information:" + orderInfo);
+        }
+    
+        // Handle received confirmation
+        function handleReceivedConfirmation(input) {
+            const lowerInput = input.toLowerCase();
+            
+            if (lowerInput.includes("not received") || lowerInput.includes("have not") || lowerInput.includes("can't find") || lowerInput.includes("still")) {
+    // Get the email from the order
+    const order = orderDatabase[chatState.orderNumber];
+    const maskedEmail = maskEmail(order.email);
+    
+    chatState.currentStep = 'ended';
+    addBotMessage("I understand. I'll create a claim for your missing package. A customer service representative will reach out to you at " + maskedEmail + " within the next 24 hours to assist further. Is there anything else I can help you with today?", [
+        "Yes, help me with something else",
+        "No, thank you"
+    ]);
+} else if (lowerInput.includes("found") || lowerInput.includes("thank")) {
+    chatState.currentStep = 'ended';
+    addBotMessage("Great! Is there anything else I can help you with?", [
+        "Check another order",
+        "No, thank you"
+    ]);
+}
+        }
+    
+        // Handle representative contact
+        function handleRepContact(input) {
+            const lowerInput = input.toLowerCase();
+            
+            if (lowerInput.includes('yes') || lowerInput.includes('contact')) {
+                const maskedEmail = maskEmail(chatState.email);
+                chatState.currentStep = 'ended';
+                addBotMessage("Perfect! A customer service representative will reach out to you at " + maskedEmail + " within the next 24 hours. Is there anything else I can help you with today?", [
+                    "Yes, help me with something else",
+                    "No, thank you"
+                ]);
+            } else {
+                chatState.currentStep = 'ended';
+                addBotMessage("Thank you for chatting with us! Have a wonderful day!");
+            }
+        }
+    
+        // Handle end state actions (either user can get help with another order or that is the end of the chat)
+        function handleEndState(input) {
+            const lowerInput = input.toLowerCase();
+            
+            if (lowerInput.includes('yes') || lowerInput.includes('another') || lowerInput.includes('check') || lowerInput.includes('help') || lowerInput.includes('something')) {
+                chatState.currentStep = 'greeting';
+                chatState.orderNumber = '';
+                chatState.email = '';
+                addBotMessage("Sure! How can I help you?", [
+                    "Check order status",
+                    "I haven't received my package"
+                ]);
+            } else {
+                addBotMessage("Thank you for chatting with us! Have a wonderful day!");
+            }
+        }
+    
+        // Event listeners
+        sendButton.addEventListener('click', () => {
+            const message = userInput.value.trim();
+            if (message) {
+                addUserMessage(message);
+                userInput.value = '';
+                processUserInput(message);
+            }
+        });
+    
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+    
+        // Initialize the chatbot
+        window.onload = initChat;
+    </script>
+</body>
+</html>
